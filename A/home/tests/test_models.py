@@ -4,6 +4,14 @@ from model_bakery import baker
 
 
 class TestWriterModel(TestCase):
+
+    def setUp(self):
+        self.writer = baker.make(
+            Writer,
+            first_name="sss",
+            last_name="shah",
+        )
+
     def test_model_str(self):
         # writer = Writer.objects.create(
         #     first_name="sss",
@@ -11,9 +19,5 @@ class TestWriterModel(TestCase):
         #     email="shah@email.com",
         #     password="shah",
         # )
-        writer = baker.make(
-            Writer,
-            first_name="sss",
-            last_name="shah",
-        )
-        self.assertEqual(str(writer), "sss shah")
+
+        self.assertEqual(str(self.writer), "sss shah")
