@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from .froms import UserRegistrationForm
+from .forms import UserRegistrationForm
 from django.contrib.auth.models import User
 
 
