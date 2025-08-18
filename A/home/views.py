@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 from .forms import UserRegistrationForm
 from django.contrib.auth.models import User
+from .models import Writer
 
 
 class HomeView(View):
@@ -36,3 +37,9 @@ class UserRegisterView(View):
             )
             return redirect("home:home")
         return render(request, self.template_name, {"form": form})
+
+
+class WriterView(View):
+    def get(self , request):
+        writers  = Writer.objects.all()
+        return render(request ,"home/writers.html" , {"writers":writers})
