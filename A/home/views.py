@@ -33,13 +33,13 @@ class UserRegisterView(View):
         if form.is_valid():
             cd = form.cleaned_data
             User.objects.create_user(
-                username=cd["username"], email=cd["email"], password=cd["password"]
+                username=cd["username"], email=cd["email"], password=cd["password1"]
             )
             return redirect("home:home")
         return render(request, self.template_name, {"form": form})
 
 
 class WriterView(View):
-    def get(self , request):
-        writers  = Writer.objects.all()
-        return render(request ,"home/writers.html" , {"writers":writers})
+    def get(self, request):
+        writers = Writer.objects.all()
+        return render(request, "home/writers.html", {"writers": writers})
