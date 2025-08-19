@@ -1,7 +1,8 @@
-from django.test import TestCase, Client
+from django.test import TestCase, Client, RequestFactory
 from django.urls import reverse
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from home.forms import UserRegistrationForm
+from home.views import HomeView
 
 
 class TestUserRegistration(TestCase):
@@ -58,4 +59,24 @@ class TestWriter(TestCase):
     def test_writers(self):
         response = self.client.get(reverse("home:writers"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response , 'home/writers.html')
+        self.assertTemplateUsed(response, "home/writers.html")
+
+
+class TestHome(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="root", email="root@email.com", password="root"
+        )
+        self.factory = RequestFactory()
+
+    def test_home_user_authenticated(self):
+        request = self.factory.get(reverse("home:home"))
+        request.user = self.user
+        response = HomeView.as_view()(request)
+        self.assertEqual(response.status_code, 302)
+
+    def test_home_user_authenticated(self):
+        request = self.factory.get(reverse("home:home"))
+        request.user = AnonymousUser()
+        response = HomeView.as_view()(request)
+        self.assertEqual(response.status_code, 200)

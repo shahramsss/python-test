@@ -8,7 +8,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 class HomeView(View):
     def get(self, request):
-        return render(request, "home/home.html")
+        if request.user.is_authenticated:
+            return redirect("home:writers")
+        else:
+            return render(request, "home/home.html")
 
 
 class AboutView(View):
