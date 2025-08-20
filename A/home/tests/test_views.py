@@ -62,6 +62,12 @@ class TestWriter(TestCase):
         self.assertTemplateUsed(response, "home/writers.html")
 
 
+"""
+برای تست مستقیم viewها در جنگو، بدون اجرای کامل چرخهٔ درخواست-پاسخ، می‌تونی از کلاس RequestFactory استفاده کنی.
+ این ابزار بهت اجازه می‌ده یک شیء درخواست بسازی و اون رو مستقیماً به view مورد نظر ارسال کنی، مثل یک تابع معمولی.
+"""
+
+
 class TestHome(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
