@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     # local apps
     "home.apps.HomeConfig",
     "tracking.apps.TrackingConfig",
+    # third apps
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

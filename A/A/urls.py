@@ -22,5 +22,6 @@ from django.conf import settings
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", include("home.urls")),
+    path("home/", include("home.urls")),
+    path("tracking/", include("tracking.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
