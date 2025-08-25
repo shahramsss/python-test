@@ -1,5 +1,6 @@
 from ipaddress import ip_address
 from django.utils.timezone import now
+from .app_settings import app_setting
 
 
 class BaseLoggingMixin:
@@ -9,11 +10,16 @@ class BaseLoggingMixin:
 
     def finalize_response(self, request, response, *args, **kwargs):
         response = super().finalize_response(request, response, *args, **kwargs)
+        user = self._get_user(request)
         self.log.update(
             {
                 "remote_addr": self._get_ip_address(request),
                 "view": self._get_view_name(request),
                 "view_method": self._get_view_method(request),
+                "path": self._get_path(request),
+                "host": request.get_host(),
+                "method": request.method,
+                "user": user,
             }
         )
         self.handle_log()
@@ -51,3 +57,12 @@ class BaseLoggingMixin:
         if hasattr(self, "action"):
             return self.action or None
         return request.method.lower()
+
+    def _get_path(self, request):
+        return request.path[: app_setting.PATH_LENGTH]
+
+    def _get_user(self, request):
+        user = request.user
+        if user.anonymoos:
+            return None
+        return user
