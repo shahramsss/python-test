@@ -1,6 +1,7 @@
 from ipaddress import ip_address
 from django.utils.timezone import now
 
+
 class BaseLoggingMixin:
     def initial(self, request, *args, **kwargs):
         self.log = {"requested_at": now()}
@@ -8,9 +9,12 @@ class BaseLoggingMixin:
 
     def finalize_response(self, request, response, *args, **kwargs):
         response = super().finalize_response(request, response, *args, **kwargs)
-        self.log.update({
-            "remote_addr": self._get_ip_address(request),
-        })
+        self.log.update(
+            {
+                "remote_addr": self._get_ip_address(request),
+                "view": self._get_view_name(request),
+            }
+        )
         self.handle_log()
         return response
 
@@ -29,3 +33,15 @@ class BaseLoggingMixin:
                 return str(ip_address(addr))
             except ValueError:
                 pass
+
+    def _get_view_name(self, request):
+        method = request.method.lower()
+        try:
+            attribute = getattr(self, method)
+            return (
+                type(attribute.__self__).__module__
+                + "."
+                + type(attribute.__self__).__name__
+            )
+        except AttributeError:
+            return None
