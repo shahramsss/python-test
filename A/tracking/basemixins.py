@@ -20,6 +20,9 @@ class BaseLoggingMixin:
                 "host": request.get_host(),
                 "method": request.method,
                 "user": user,
+                "username_persistent": user.get_username() if user else "Anonymous",
+                "request_ms": self._get_request_ms(),
+                "status_code": response.status_code,
             }
         )
         self.handle_log()
@@ -63,6 +66,11 @@ class BaseLoggingMixin:
 
     def _get_user(self, request):
         user = request.user
-        if user.anonymous:
+        if user.is_anonymous:
             return None
         return user
+
+    def _get_request_ms(self):
+        response_timedelta = now() - self.log["requested_at"]
+        response_ms = int(response_timedelta.total_seconds() * 1000)
+        return max(response_ms, 0)
