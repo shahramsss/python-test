@@ -1,30 +1,34 @@
 from ipaddress import ip_address
 from django.utils.timezone import now
 from .app_settings import app_setting
+import traceback
 
 
 class BaseLoggingMixin:
+    logging_methods = "__all__"
+
     def initial(self, request, *args, **kwargs):
         self.log = {"requested_at": now()}
         return super().initial(request, *args, **kwargs)
 
     def finalize_response(self, request, response, *args, **kwargs):
         response = super().finalize_response(request, response, *args, **kwargs)
-        user = self._get_user(request)
-        self.log.update(
-            {
-                "remote_addr": self._get_ip_address(request),
-                "view": self._get_view_name(request),
-                "view_method": self._get_view_method(request),
-                "path": self._get_path(request),
-                "host": request.get_host(),
-                "method": request.method,
-                "user": user,
-                "username_persistent": user.get_username() if user else "Anonymous",
-                "request_ms": self._get_request_ms(),
-                "status_code": response.status_code,
-            }
-        )
+        if self.should_log(response , request):
+            user = self._get_user(request)
+            self.log.update(
+                {
+                    "remote_addr": self._get_ip_address(request),
+                    "view": self._get_view_name(request),
+                    "view_method": self._get_view_method(request),
+                    "path": self._get_path(request),
+                    "host": request.get_host(),
+                    "method": request.method,
+                    "user": user,
+                    "username_persistent": user.get_username() if user else "Anonymous",
+                    "request_ms": self._get_request_ms(),
+                    "status_code": response.status_code,
+                }
+            )
         self.handle_log()
         return response
 
@@ -74,3 +78,13 @@ class BaseLoggingMixin:
         response_timedelta = now() - self.log["requested_at"]
         response_ms = int(response_timedelta.total_seconds() * 1000)
         return max(response_ms, 0)
+
+    def handle_exception(self, exc):
+        response = super().handle_exception(exc)
+        self.log["errors"] = traceback.format_exc()
+        return response
+
+    def should_log(self, response, request):
+        return (
+            self.logging_methods == "__all__" or request.method in self.logging_methods
+        )

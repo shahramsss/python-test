@@ -5,5 +5,8 @@ from .mixins import LoggingMixin
 
 
 class HomeView(LoggingMixin, APIView):
+    logging_methods = ['GET' , 'POST']
     def get(self, request):
         return Response("hello , hi ")
+    
+   
