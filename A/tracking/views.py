@@ -6,6 +6,7 @@ from .mixins import LoggingMixin
 
 class HomeView(LoggingMixin, APIView):
     # logging_methods = ['GET' , 'POST']
+    sensitive_fields = {'pass'}
 
     def should_log(self, response, request):
         return response.status_code > 400
